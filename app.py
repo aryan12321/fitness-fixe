@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify
 from datetime import datetime, timedelta
 
 
+
 app = Flask(__name__)
 
 # -------------------------
@@ -1209,6 +1210,34 @@ def alcohol():
 
     return render_template("alcohol.html", result=result, calc={"name": "Alcohol Impact", "icon": "🍺"})
 
+from flask import Response
+
+# --- Sitemap for calculators ---
+@app.route("/sitemap.xml", methods=["GET"])
+def sitemap():
+    try:
+        base_url = "https://calculators.yuktilabs.in"
+        urls = []
+        for calc in CALCULATORS:
+            urls.append(f"{base_url}/{calc['route']}")
+
+        # Build XML
+        xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+        for url in urls:
+            xml += "  <url>\n"
+            xml += f"    <loc>{url}</loc>\n"
+            xml += f"    <lastmod>{datetime.utcnow().strftime('%Y-%m-%d')}</lastmod>\n"
+            xml += "    <changefreq>weekly</changefreq>\n"
+            xml += "    <priority>0.8</priority>\n"
+            xml += "  </url>\n"
+
+        xml += "</urlset>"
+
+        return Response(xml, mimetype="application/xml")
+    except Exception as e:
+        return Response(f"Error generating sitemap: {e}", mimetype="text/plain")
 
 @app.route("/<tool>")
 def placeholder(tool):
