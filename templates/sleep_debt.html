@@ -2,81 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ calc.icon }} {{ calc.name }} | Fitness Fixe</title>
+  <title>⏰ Sleep Debt Calculator | Track Lost Sleep</title>
+  <meta name="description" content="Calculate your sleep debt with our free Sleep Debt Calculator. Learn how much rest you’re missing and how to recover for better health.">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background: #f9fafb; }
-    .card { border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-    .result-box { background: #eef2ff; border-radius: 12px; padding: 20px; }
-    .scale-bar { height: 20px; }
-    .pointer { position: absolute; top: -18px; font-size: 18px; }
-  </style>
+
+  <!-- FAQ Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is sleep debt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sleep debt is the difference between the hours of sleep you need and the hours you actually get. Over time, this debt adds up and affects your health."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you recover from sleep debt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Recover gradually by going to bed earlier, taking short naps, and ensuring consistent 8–9 hours of sleep for several days."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is it possible to fully repay sleep debt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, but it takes time. A few nights of longer rest combined with healthy sleep habits can restore your energy levels."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
-<body>
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-7 col-md-9">
-      <div class="card p-4">
-        <h2 class="text-center mb-4">{{ calc.icon }} {{ calc.name }}</h2>
+<body class="bg-light">
+<div class="container py-4">
+  <h1 class="mb-3">⏰ Sleep Debt Calculator</h1>
+  <p class="lead">Find out how much <strong>sleep debt</strong> you’ve accumulated and learn how to recover with healthy rest.</p>
 
-        <!-- Input Form -->
-        <form method="POST">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label">Age</label>
-              <input type="number" class="form-control" name="age" required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Avg Sleep (hrs/night)</label>
-              <input type="number" step="0.1" class="form-control" name="avg" required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Days to Track</label>
-              <input type="number" class="form-control" name="days" value="7">
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary w-100 mt-3">Calculate</button>
-        </form>
-
-        {% if result %}
-        <div class="result-box mt-4">
-          {% if result.error %}
-            <div class="alert alert-danger">{{ result.error }}</div>
-          {% else %}
-            <h4 class="text-center mb-3">⏰ Sleep Debt Report</h4>
-            <ul class="list-group mb-3">
-              <li class="list-group-item">Ideal Sleep (per night): <strong>{{ result.ideal }} hrs</strong></li>
-              <li class="list-group-item">Your Avg Sleep: <strong>{{ result.avg }} hrs</strong></li>
-              <li class="list-group-item">Tracking Period: <strong>{{ result.days }} days</strong></li>
-              <li class="list-group-item">Total Sleep Debt: <strong>{{ result.total_debt }} hrs</strong></li>
-            </ul>
-
-            <!-- Visual Scale -->
-            <h6>Debt Scale</h6>
-            <div class="position-relative mb-2" style="height:36px;">
-              <div class="d-flex scale-bar bg-light" style="height:16px;">
-                <div class="bg-success" style="width:25%"></div>
-                <div class="bg-warning" style="width:25%"></div>
-                <div class="bg-orange" style="width:25%; background:#ff9800;"></div>
-                <div class="bg-danger" style="width:25%"></div>
-              </div>
-              <div class="pointer" style="left: {{ result.scale.pointer_pct }}%; transform: translateX(-50%);">🔻</div>
-            </div>
-            <div class="d-flex justify-content-between small text-muted">
-              <span>0 hrs</span>
-              <span>5 hrs</span>
-              <span>14 hrs</span>
-              <span>21+ hrs</span>
-            </div>
-
-            <!-- Advice -->
-            <div class="alert alert-info text-center mt-3">{{ result.advice }}</div>
-          {% endif %}
-        </div>
-        {% endif %}
+  <!-- Calculator Form -->
+  <form method="POST" class="card p-3 shadow-sm mb-3">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Average Sleep (hrs/night)</label>
+        <input name="avg" type="number" step="0.1" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Age</label>
+        <input name="age" type="number" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Days to Track</label>
+        <input name="days" type="number" class="form-control" value="7">
       </div>
     </div>
+    <button class="btn btn-primary mt-3">Calculate</button>
+  </form>
+
+  <!-- Results -->
+  {% if result %}
+  <div class="card p-3 shadow-sm">
+    <h3>Results</h3>
+    <p>Ideal Sleep: <strong>{{ result.ideal }} hrs/night</strong></p>
+    <p>Total Sleep Debt over {{ result.days }} days: <strong>{{ result.total_debt }} hrs</strong></p>
+    <div class="alert alert-info">{{ result.advice }}</div>
   </div>
+  {% endif %}
+
+  <!-- SEO Content -->
+  <section class="mt-5">
+    <h2>What is Sleep Debt?</h2>
+    <p>Sleep debt is the difference between the <strong>ideal sleep your body needs</strong> and the sleep you actually get. Missing 1–2 hours each night quickly adds up to chronic sleep deprivation.</p>
+
+    <h3>How to Repay Sleep Debt</h3>
+    <ul>
+      <li>Go to bed earlier for a few nights.</li>
+      <li>Take short 20–30 min naps.</li>
+      <li>Catch up gradually instead of oversleeping in one day.</li>
+    </ul>
+
+    <h3>Why Sleep Debt Matters</h3>
+    <p>Chronic sleep debt can affect your:</p>
+    <ul>
+      <li>Focus and memory</li>
+      <li>Weight management</li>
+      <li>Heart health</li>
+      <li>Immunity</li>
+    </ul>
+
+    <h3>FAQs</h3>
+    <p><strong>Q. What is sleep debt?</strong><br>
+    The difference between needed and actual sleep hours.</p>
+
+    <p><strong>Q. How do you recover from sleep debt?</strong><br>
+    By sleeping earlier, taking short naps, and staying consistent with 8–9 hours.</p>
+
+    <p><strong>Q. Is it possible to fully repay?</strong><br>
+    Yes, with consistent rest and sleep hygiene.</p>
+  </section>
 </div>
 </body>
 </html>
