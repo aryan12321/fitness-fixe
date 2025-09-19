@@ -1,4 +1,6 @@
 from flask import Flask, request, render_template, jsonify
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 
@@ -989,6 +991,146 @@ def diabetes():
             result = {"error": f"Calculation failed: {e}"}
 
     return render_template("diabetes.html", result=result, calc={"name": "Diabetes Risk", "icon": "🩸"})
+
+
+
+# --- Sleep Calculator ---
+from datetime import datetime, timedelta
+
+@app.route("/sleep", methods=["GET", "POST"])
+def sleep():
+    result = None
+    if request.method == "POST":
+        try:
+            bedtime = request.form.get("bedtime")
+            wakeup = request.form.get("wakeup")
+
+            sleep_cycles = 90  # minutes
+            fall_asleep_buffer = 15
+            suggestions = []
+            advice = ""
+
+            if bedtime and not wakeup:
+                bt = datetime.strptime(bedtime, "%H:%M")
+                for cycles in range(3, 7):  # 4.5–9 hrs
+                    wake = bt + timedelta(minutes=fall_asleep_buffer + cycles * sleep_cycles)
+                    suggestions.append(wake.strftime("%I:%M %p"))
+                advice = "Aim for 5–6 cycles (~7.5–9 hrs). Pick a wake time that fits your lifestyle."
+                result = {"mode": "bedtime", "bedtime": bedtime, "suggestions": suggestions, "advice": advice}
+
+            elif wakeup and not bedtime:
+                wu = datetime.strptime(wakeup, "%H:%M")
+                for cycles in range(6, 2, -1):
+                    bed = wu - timedelta(minutes=fall_asleep_buffer + cycles * sleep_cycles)
+                    suggestions.append(bed.strftime("%I:%M %p"))
+                advice = "Going to bed at these times ensures you complete healthy sleep cycles."
+                result = {"mode": "wakeup", "wakeup": wakeup, "suggestions": suggestions, "advice": advice}
+
+            elif bedtime and wakeup:
+                bt = datetime.strptime(bedtime, "%H:%M")
+                wu = datetime.strptime(wakeup, "%H:%M")
+                if wu < bt:
+                    wu += timedelta(days=1)  # handle overnight
+                duration = (wu - bt).total_seconds() / 3600
+                cycles = round(duration * 60 / sleep_cycles, 1)
+
+                # Advice based on duration
+                if duration < 6:
+                    advice = "❌ Too short — linked with fatigue, poor focus, and health risk."
+                elif 6 <= duration < 7.5:
+                    advice = "⚠️ Slightly short — try extending to 7.5 hrs for full recovery."
+                elif 7.5 <= duration <= 9:
+                    advice = "✅ Optimal — excellent range for health and performance."
+                else:
+                    advice = "⚠️ Oversleeping — too much sleep may signal fatigue or imbalance."
+
+                # For gauge scale (target = 8 hrs)
+                min_hr, max_hr, target_hr = 4, 12, 8
+                pointer_pct = (duration - min_hr) / (max_hr - min_hr) * 100
+                pointer_pct = max(0, min(100, round(pointer_pct, 2)))
+
+                result = {
+                    "mode": "both",
+                    "bedtime": bedtime,
+                    "wakeup": wakeup,
+                    "duration": round(duration, 2),
+                    "cycles": cycles,
+                    "advice": advice,
+                    "scale": {
+                        "min_hr": min_hr,
+                        "max_hr": max_hr,
+                        "target_hr": target_hr,
+                        "pointer_pct": pointer_pct,
+                    }
+                }
+            else:
+                result = {"error": "Please provide at least bedtime or wake-up time."}
+
+        except Exception as e:
+            result = {"error": f"Calculation failed: {e}"}
+
+    return render_template("sleep.html", result=result, calc={"name": "Sleep Calculator", "icon": "🛌"})
+
+
+# --- Sleep Debt Calculator ---
+@app.route("/sleep_debt", methods=["GET", "POST"])
+def sleep_debt():
+    result = None
+    if request.method == "POST":
+        try:
+            avg = float(request.form.get("avg", 0))
+            age = int(request.form.get("age", 0))
+            days = int(request.form.get("days", 7))
+
+            # Ideal sleep based on NSF guidelines
+            if age < 14:
+                ideal = 9
+            elif age <= 17:
+                ideal = 8.5
+            elif age <= 64:
+                ideal = 8
+            else:
+                ideal = 7.5
+
+            debt_per_day = ideal - avg
+            total_debt = round(debt_per_day * days, 1)
+
+            if total_debt <= 0:
+                advice = "✅ No sleep debt — you’re meeting or exceeding your ideal sleep."
+            elif total_debt <= 5:
+                advice = "⚠️ Mild sleep debt — try going to bed earlier or adding naps."
+            elif total_debt <= 14:
+                advice = "❌ Moderate debt — recovery sleep needed. Aim for a few nights of 8–9 hrs."
+            else:
+                advice = "🚨 Severe debt — linked to major fatigue, mood issues, and health risks."
+
+            # Scale for UI
+            thresholds = [5, 14, 21]
+            max_debt = 28
+            pointer_pct = (total_debt / max_debt) * 100
+            pointer_pct = max(0, min(100, round(pointer_pct, 1)))
+
+            result = {
+                "avg": avg,
+                "ideal": ideal,
+                "days": days,
+                "total_debt": total_debt,
+                "advice": advice,
+                "scale": {
+                    "pointer_pct": pointer_pct,
+                    "thresholds": thresholds,
+                    "max_debt": max_debt,
+                }
+            }
+
+        except Exception as e:
+            result = {"error": f"Calculation failed: {e}"}
+
+    return render_template("sleep_debt.html", result=result, calc={"name": "Sleep Debt", "icon": "⏰"})
+
+
+
+
 
 # --- Alcohol Impact Calculator ---
 @app.route("/alcohol", methods=["GET", "POST"])

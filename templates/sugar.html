@@ -1,22 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ calc.icon }} {{ calc.name }} | Fitness Fixe</title>
+  <title>Sugar Intake Calculator — Yuktilabs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Free sugar intake calculator — estimate daily sugar consumption from food and drinks, compare with WHO guidelines and get health advice." />
+  <meta name="keywords" content="sugar calculator, sugar intake, daily sugar limit, WHO sugar guidelines, health calculator, Yuktilabs" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://calculators.yuktilabs.in/sugar" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Sugar Intake Calculator — Yuktilabs" />
+  <meta property="og:description" content="Check your daily sugar intake and compare it to WHO recommended safe limits." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://calculators.yuktilabs.in/sugar" />
+  <meta property="og:image" content="https://yuktilabs.in/static/logo.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sugar Intake Calculator — Yuktilabs" />
+  <meta name="twitter:description" content="Estimate your daily sugar consumption and get personalized advice to stay healthy." />
+  <meta name="twitter:image" content="https://yuktilabs.in/static/logo.png" />
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     body { background: #f9fafb; }
     .card { border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
     .result-box { background: #fff3e0; border-radius: 12px; padding: 20px; }
     .sugar-bar { height: 22px; font-size: 0.8rem; }
   </style>
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebPage",
+    "name":"Sugar Intake Calculator",
+    "url":"https://calculators.yuktilabs.in/sugar",
+    "description":"Free calculator to estimate your daily sugar consumption and compare it with WHO recommended safe limits.",
+    "inLanguage":"en",
+    "mainEntity":{
+      "@type":"WebApplication",
+      "name":"Sugar Intake Calculator",
+      "applicationCategory":"HealthApplication",
+      "operatingSystem":"Web",
+      "url":"https://calculators.yuktilabs.in/sugar"
+    },
+    "publisher":{
+      "@type":"Organization",
+      "name":"Yuktilabs",
+      "url":"https://yuktilabs.in",
+      "logo":{"@type":"ImageObject","url":"https://yuktilabs.in/static/logo.png"}
+    }
+  }
+  </script>
 </head>
+
 <body>
   <div class="container py-5">
+    <header class="mb-4 text-center">
+      <nav><a href="https://yuktilabs.in">Yuktilabs</a> › <a href="/">Calculators</a> › Sugar</nav>
+      <h1 class="mb-3">🍬 Daily Sugar Intake Calculator</h1>
+      <p class="text-muted">Estimate your daily sugar consumption from food and drinks and compare it with WHO guidelines (ideal: 25g, max: 50g per day).</p>
+    </header>
+
     <div class="row justify-content-center">
       <div class="col-lg-7 col-md-9">
         <div class="card p-4">
-          <h2 class="text-center mb-4">{{ calc.icon }} {{ calc.name }}</h2>
+          <h2 class="text-center mb-4">🍫 Add Food & Drinks</h2>
 
           <!-- Input Form -->
           <form method="POST">
@@ -38,8 +91,7 @@
               </div>
             </div>
 
-            <h5 class="mt-4">🍫 Add Food & Drinks</h5>
-            <div id="food-container">
+            <div id="food-container" class="mt-4">
               <div class="row g-2 mb-2 food-row">
                 <div class="col-md-7">
                   <select class="form-select" name="item">
@@ -52,7 +104,7 @@
                   <input type="number" class="form-control" name="quantity" placeholder="Qty" min="0">
                 </div>
                 <div class="col-md-2">
-                  <button type="button" class="btn btn-outline-danger w-100 remove-row"> Remove Row </button>
+                  <button type="button" class="btn btn-outline-danger w-100 remove-row">Remove</button>
                 </div>
               </div>
             </div>
@@ -67,7 +119,7 @@
             {% if result.error %}
               <div class="alert alert-danger">{{ result.error }}</div>
             {% else %}
-              <h4 class="text-center mb-3">🍬 Your Sugar Report</h4>
+              <h3 class="text-center mb-3">🍭 Your Sugar Report</h3>
               <ul class="list-group mb-3">
                 <li class="list-group-item">Your Intake: <strong>{{ result.total_sugar }} g/day</strong></li>
                 <li class="list-group-item">Ideal Limit (5%): <strong>{{ result.max_safe }} g/day</strong></li>
@@ -76,7 +128,6 @@
                 <li class="list-group-item">Status: <strong>{{ result.status }}</strong></li>
               </ul>
 
-              <!-- Progress Bar -->
               <div class="progress mb-2">
                 <div class="progress-bar bg-danger sugar-bar" role="progressbar"
                      style="width: {{ (result.total_sugar / result.max_limit * 100) | round(0) }}%;"
@@ -86,8 +137,7 @@
               </div>
               <p class="text-center text-muted">Relative to safe upper limit (10% of daily calories)</p>
 
-              <!-- Breakdown -->
-              <h6>Breakdown:</h6>
+              <h6>Breakdown</h6>
               <ul class="list-group mb-3">
                 {% for row in result.breakdown %}
                   <li class="list-group-item d-flex justify-content-between">
@@ -97,7 +147,6 @@
                 {% endfor %}
               </ul>
 
-              <!-- Advice -->
               <div class="alert alert-info text-center">{{ result.advice }}</div>
             {% endif %}
           </div>
@@ -105,6 +154,20 @@
         </div>
       </div>
     </div>
+
+    <section class="mt-5">
+      <h2>WHO Guidelines on Sugar Intake</h2>
+      <p>The World Health Organization recommends limiting free sugars to <strong>&lt;10%</strong> of daily calories, with an ideal target of <strong>&lt;5%</strong> for better health. For an average adult, this equals about 25–50 g of sugar per day.</p>
+    </section>
+
+    <footer class="mt-4 text-center">
+      <p>Other calculators: 
+        <a href="/protein">Protein</a> • 
+        <a href="/bmi">BMI</a> • 
+        <a href="/tdee">TDEE</a> • 
+        <a href="/sleep">Sleep</a>
+      </p>
+    </footer>
   </div>
 
   <script>

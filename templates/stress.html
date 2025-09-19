@@ -2,9 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ calc.icon }} {{ calc.name }} | Fitness Fixe</title>
+  <title>Stress Balance Calculator — Yuktilabs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Free stress balance calculator — measure your stress vs relaxation levels. Check your stress score and get personalized advice for better balance." />
+  <meta name="keywords" content="stress calculator, stress test, relaxation balance, stress score, wellness calculator, Yuktilabs" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://calculators.yuktilabs.in/stress" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Stress Balance Calculator — Yuktilabs" />
+  <meta property="og:description" content="Check your stress score and relaxation recovery. Free online stress calculator to improve your balance and mental well-being." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://calculators.yuktilabs.in/stress" />
+  <meta property="og:image" content="https://yuktilabs.in/static/logo.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Stress Balance Calculator — Yuktilabs" />
+  <meta name="twitter:description" content="Calculate your stress vs relaxation balance with this free tool. Get actionable advice for better health and wellness." />
+  <meta name="twitter:image" content="https://yuktilabs.in/static/logo.png" />
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body { background: #f9fafb; }
     .card { border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
@@ -12,13 +32,44 @@
     .pointer { position: absolute; top: -18px; font-size: 18px; }
     canvas { max-height: 300px; }
   </style>
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebPage",
+    "name":"Stress Balance Calculator",
+    "url":"https://calculators.yuktilabs.in/stress",
+    "description":"Free calculator to check your stress balance and relaxation recovery.",
+    "inLanguage":"en",
+    "mainEntity":{
+      "@type":"WebApplication",
+      "name":"Stress Balance Calculator",
+      "applicationCategory":"HealthApplication",
+      "operatingSystem":"Web",
+      "url":"https://calculators.yuktilabs.in/stress"
+    },
+    "publisher":{
+      "@type":"Organization",
+      "name":"Yuktilabs",
+      "url":"https://yuktilabs.in",
+      "logo":{"@type":"ImageObject","url":"https://yuktilabs.in/static/logo.png"}
+    }
+  }
+  </script>
 </head>
 <body>
 <div class="container py-5">
+  <header class="mb-4 text-center">
+    <nav><a href="https://yuktilabs.in">Yuktilabs</a> › <a href="/">Calculators</a> › Stress</nav>
+    <h1 class="mb-3">🧘 Stress Balance Calculator</h1>
+    <p class="text-muted">Measure your stress vs relaxation balance. Enter your daily stress and relaxation factors to get a <strong>stress score</strong> and personalized advice.</p>
+  </header>
+
   <div class="row justify-content-center">
     <div class="col-lg-8 col-md-10">
       <div class="card p-4">
-        <h2 class="text-center mb-4">{{ calc.icon }} {{ calc.name }}</h2>
+        <h2 class="text-center mb-4">Enter Your Stress & Relaxation Factors</h2>
 
         <!-- Input Form -->
         <form method="POST">
@@ -62,7 +113,7 @@
           {% if result.error %}
             <div class="alert alert-danger">{{ result.error }}</div>
           {% else %}
-            <h4 class="text-center mb-3">🧘 Stress Balance Report</h4>
+            <h3 class="text-center mb-3">🧘 Stress Balance Report</h3>
             <ul class="list-group mb-3">
               <li class="list-group-item">Stress Score (out of 100): <strong>{{ result.score }}/100</strong></li>
               <li class="list-group-item">Total Stress Points: <strong>{{ result.stress_total }}</strong></li>
@@ -121,5 +172,23 @@
   });
   {% endif %}
 </script>
+
+<footer class="mt-4 text-center">
+  <p>Other calculators: 
+    <a href="/protein">Protein</a> • 
+    <a href="/bmi">BMI</a> • 
+    <a href="/tdee">TDEE</a> • 
+    <a href="/sleep">Sleep Analyzer</a> • 
+    <a href="/sugar">Sugar</a> • 
+    <a href="/alcohol">Alcohol</a> • 
+    <a href="/bodyfat">Body Fat</a> • 
+    <a href="/bp">Blood Pressure</a> • 
+    <a href="/calories">Calories Burned</a> • 
+    <a href="/diabetes">Diabetes Risk</a> • 
+    <a href="/ideal-weight">Ideal Weight</a> • 
+    <a href="/macro">Macro</a> • 
+    <a href="/sleep-debt">Sleep Debt</a>
+  </p>
+</footer>
 </body>
 </html>
