@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title if title else "Fitness Fixe" }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; }
+    .sidebar {
+      height: 100vh;
+      background: #212529;
+      color: #fff;
+      padding: 1rem;
+    }
+    .sidebar a {
+      color: #adb5bd;
+      text-decoration: none;
+      display: block;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .sidebar a:hover, .sidebar .active {
+      background: #495057;
+      color: #fff;
+    }
+    .content {
+      padding: 2rem;
+    }
+    h1, h2, h3 { color: #212529; }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      
+      <!-- Sidebar -->
+      <nav class="col-md-3 col-lg-2 sidebar">
+  <h4 class="mb-3">⚡ Fitness Fixe</h4>
+
+{% set categories = ["Nutrition", "Fitness", "Sleep", "Health"] %}
+{% for cat in categories %}
+  <div class="mb-4">
+    <h6 class="text-light">{{ cat }}</h6>
+    {% for calc in calculators if calc["category"] == cat %}
+      <a href="{{ url_for(calc['route']) }}">{{ calc["icon"] }} {{ calc["name"] }}</a>
+    {% endfor %}
+  </div>
+{% endfor %}
+
+</nav>
+
+      
+      <!-- Content -->
+      <main class="col-md-9 col-lg-10 content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+</body>
+</html>

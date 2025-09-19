@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ calc.icon }} {{ calc.name }} | Fitness Fixe</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: #f9fafb; }
+    .card { border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.06); }
+    .result-box { background: #eef2ff; border-radius: 10px; padding: 18px; }
+    canvas { max-height: 240px; }
+  </style>
+</head>
+<body>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card p-4">
+        <h2 class="text-center mb-4">{{ calc.icon }} {{ calc.name }}</h2>
+
+        <!-- Form -->
+        <form method="POST">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Fasting Sugar (mg/dL)</label>
+              <input type="number" step="0.1" class="form-control" name="fasting" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Post-Meal Sugar (mg/dL)</label>
+              <input type="number" step="0.1" class="form-control" name="postmeal" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Age</label>
+              <input type="number" class="form-control" name="age">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">BMI</label>
+              <input type="number" step="0.1" class="form-control" name="bmi">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Family History</label>
+              <select class="form-select" name="family">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Activity Level</label>
+              <select class="form-select" name="activity">
+                <option value="sedentary">Sedentary</option>
+                <option value="moderate">Moderate</option>
+                <option value="active">Active</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Diet</label>
+              <select class="form-select" name="diet">
+                <option value="balanced">Balanced</option>
+                <option value="high_sugar">High Sugar</option>
+                <option value="high_fat">High Fat</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-3">Check Risk</button>
+        </form>
+
+        {% if result %}
+        <div class="result-box mt-4">
+          {% if result.error %}
+            <div class="alert alert-danger">{{ result.error }}</div>
+          {% else %}
+            <h4 class="text-center mb-3">🩸 Diabetes Risk Report</h4>
+            <ul class="list-group mb-3">
+              <li class="list-group-item">Fasting Sugar: <strong>{{ result.fasting }} mg/dL</strong></li>
+              <li class="list-group-item">Post-Meal Sugar: <strong>{{ result.postmeal }} mg/dL</strong></li>
+              {% if result.age %}<li class="list-group-item">Age: <strong>{{ result.age }}</strong></li>{% endif %}
+              {% if result.bmi %}<li class="list-group-item">BMI: <strong>{{ result.bmi }}</strong></li>{% endif %}
+              <li class="list-group-item">Risk Category: <strong>{{ result.category }}</strong></li>
+            </ul>
+
+            <!-- Gauge Chart -->
+            <div class="text-center">
+              <canvas id="riskGauge"></canvas>
+            </div>
+
+            <div class="alert alert-info text-center mt-3">{{ result.advice }}</div>
+            {% if result %}
+<div class="result-box mt-4">
+  {% if result.error %}
+    <div class="alert alert-danger">{{ result.error }}</div>
+  {% else %}
+    <h4 class="text-center mb-3">🩸 Diabetes Risk Report</h4>
+    <ul class="list-group mb-3">
+      <li class="list-group-item">Fasting Sugar: <strong>{{ result.fasting }} mg/dL</strong></li>
+      <li class="list-group-item">Post-Meal Sugar: <strong>{{ result.postmeal }} mg/dL</strong></li>
+      {% if result.age %}<li class="list-group-item">Age: <strong>{{ result.age }}</strong></li>{% endif %}
+      {% if result.bmi %}<li class="list-group-item">BMI: <strong>{{ result.bmi }}</strong></li>{% endif %}
+      <li class="list-group-item">Risk Category: <strong>{{ result.category }}</strong></li>
+    </ul>
+
+    <!-- Gauge Chart -->
+    <div class="text-center">
+      <canvas id="riskGauge"></canvas>
+    </div>
+
+    <div class="alert alert-info text-center mt-3">{{ result.advice }}</div>
+
+    <!-- Lifestyle Tips -->
+    <h5 class="mt-4 text-center">💡 Lifestyle Tips</h5>
+    <ul class="list-group mb-3">
+      {% for tip in result.tips %}
+        <li class="list-group-item">✔️ {{ tip }}</li>
+      {% endfor %}
+    </ul>
+
+    <!-- Reference Table -->
+    <h5 class="mt-4 text-center">📊 Blood Sugar Reference Ranges</h5>
+    <div class="table-responsive">
+      <table class="table table-bordered text-center">
+        <thead class="table-light">
+          <tr>
+            <th>Test</th>
+            <th>Normal</th>
+            <th>Prediabetes</th>
+            <th>Diabetes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fasting (mg/dL)</td>
+            <td>&lt;100</td>
+            <td>100–125</td>
+            <td>≥126</td>
+          </tr>
+          <tr>
+            <td>Post-Meal (mg/dL)</td>
+            <td>&lt;140</td>
+            <td>140–199</td>
+            <td>≥200</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
+{% endif %}
+
+            <!-- Reference Table -->
+            <h5 class="mt-4 text-center">📊 Blood Sugar Reference Ranges</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered text-center">
+                <thead class="table-light">
+                  <tr>
+                    <th>Test</th>
+                    <th>Normal</th>
+                    <th>Prediabetes</th>
+                    <th>Diabetes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Fasting (mg/dL)</td>
+                    <td>&lt;100</td>
+                    <td>100–125</td>
+                    <td>≥126</td>
+                  </tr>
+                  <tr>
+                    <td>Post-Meal (mg/dL)</td>
+                    <td>&lt;140</td>
+                    <td>140–199</td>
+                    <td>≥200</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+{% if result %}
+const ctx = document.getElementById('riskGauge').getContext('2d');
+new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      data: [{{ result.score }}, {{ 100 - result.score }}],
+      backgroundColor: [
+        '{{ "#4caf50" if result.category=="Normal" else "#ffc107" if "Prediabetes" in result.category else "#f44336" }}',
+        '#e0e0e0'
+      ]
+    }]
+  },
+  options: {
+    rotation: -90,
+    circumference: 180,
+    cutout: '70%',
+    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+  }
+});
+{% endif %}
+</script>
+</body>
+</html>

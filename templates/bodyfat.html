@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ calc.icon }} {{ calc.name }} | Fitness Fixe</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f9fafb; }
+    .card { border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .result-box { background: #eef2ff; border-radius: 12px; padding: 20px; }
+    .scale-bar { height: 20px; }
+    .pointer { position: absolute; top: -18px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-7 col-md-9">
+        <div class="card p-4">
+          <h2 class="text-center mb-4">{{ calc.icon }} {{ calc.name }}</h2>
+
+          <!-- Toggle -->
+          <div class="d-flex justify-content-end mb-2">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="unitToggle">
+              <label class="form-check-label" for="unitToggle">Use Imperial (ft/in)</label>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <form method="POST">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Age</label>
+                <input type="number" class="form-control" name="age" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="gender" required>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+
+              <!-- Height -->
+              <div class="col-md-4">
+                <label class="form-label">Height</label>
+                <div id="heightCmGroup">
+                  <input type="number" step="any" class="form-control" name="height_cm" placeholder="cm">
+                </div>
+                <div id="heightFtInGroup" style="display:none;">
+                  <div class="d-flex gap-2">
+                    <input type="number" class="form-control" name="height_ft" placeholder="ft">
+                    <input type="number" class="form-control" name="height_in" placeholder="in">
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Weight (kg)</label>
+                <input type="number" step="any" class="form-control" name="weight" required>
+              </div>
+            </div>
+
+            <h6 class="mt-3">Circumference</h6>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Waist</label>
+                <input type="number" class="form-control" name="waist_cm" id="waistCm" placeholder="cm">
+                <input type="number" class="form-control" name="waist_in" id="waistIn" placeholder="in" style="display:none;">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Neck</label>
+                <input type="number" class="form-control" name="neck_cm" id="neckCm" placeholder="cm">
+                <input type="number" class="form-control" name="neck_in" id="neckIn" placeholder="in" style="display:none;">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Hip (women only)</label>
+                <input type="number" class="form-control" name="hip_cm" id="hipCm" placeholder="cm">
+                <input type="number" class="form-control" name="hip_in" id="hipIn" placeholder="in" style="display:none;">
+              </div>
+            </div>
+
+            <input type="hidden" name="unit" id="unitInput" value="cm">
+            <button type="submit" class="btn btn-primary w-100 mt-3">Estimate Body Fat %</button>
+          </form>
+
+          {% if result %}
+          <div class="result-box mt-4">
+            {% if result.error %}
+              <div class="alert alert-danger">{{ result.error }}</div>
+            {% else %}
+              <h4 class="text-center mb-3">📉 Your Body Fat Report</h4>
+              <ul class="list-group mb-3">
+                <li class="list-group-item">Final Estimate: <strong>{{ result.bf_final }} %</strong></li>
+                <li class="list-group-item">BMI Method: <strong>{{ result.bf_bmi }} %</strong></li>
+                {% if result.bf_navy %}
+                  <li class="list-group-item">US Navy Method: <strong>{{ result.bf_navy }} %</strong></li>
+                {% endif %}
+                <li class="list-group-item">Category: <strong>{{ result.category }}</strong></li>
+                <li class="list-group-item">Fat Mass: <strong>{{ result.fat_mass }} kg</strong></li>
+                <li class="list-group-item">Lean Mass: <strong>{{ result.lean_mass }} kg</strong></li>
+              </ul>
+
+              <!-- Dynamic Scale -->
+              <h6>Body Fat % Scale</h6>
+              <div class="position-relative mb-2" style="height:36px;">
+                <div class="d-flex scale-bar" style="height:16px;">
+                  <div class="bg-info" style="width: {{ result.scale.segments[0] }}%"></div>
+                  <div class="bg-success" style="width: {{ result.scale.segments[1] }}%"></div>
+                  <div class="bg-primary" style="width: {{ result.scale.segments[2] }}%"></div>
+                  <div class="bg-warning" style="width: {{ result.scale.segments[3] }}%"></div>
+                  <div class="bg-danger" style="width: {{ result.scale.segments[4] }}%"></div>
+                </div>
+                <div class="pointer" style="left: {{ result.scale.pointer_pct }}%; transform: translateX(-50%);">🔻</div>
+              </div>
+              <div class="d-flex justify-content-between small text-muted">
+                <span>{{ result.scale.min_bf }}%</span>
+                {% for t in result.scale.thresholds %}
+                  <span>{{ t }}%</span>
+                {% endfor %}
+              </div>
+
+              <div class="alert alert-info text-center mt-3">{{ result.advice }}</div>
+
+              <!-- Reference Table -->
+              <h5 class="mt-4 text-center">📊 Body Fat % Categories</h5>
+              <div class="table-responsive">
+                <table class="table table-bordered table-striped text-center">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Description</th>
+                      <th>Women</th>
+                      <th>Men</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Essential Fat</td><td>10–13%</td><td>2–5%</td></tr>
+                    <tr><td>Athletes</td><td>14–20%</td><td>6–13%</td></tr>
+                    <tr><td>Fitness</td><td>21–24%</td><td>14–17%</td></tr>
+                    <tr><td>Average</td><td>25–31%</td><td>18–24%</td></tr>
+                    <tr><td>Obese</td><td>32%+</td><td>25%+</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toggle JS -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.getElementById("unitToggle");
+      const unitInput = document.getElementById("unitInput");
+
+      const heightCmGroup = document.getElementById("heightCmGroup");
+      const heightFtInGroup = document.getElementById("heightFtInGroup");
+      const waistCm = document.getElementById("waistCm");
+      const waistIn = document.getElementById("waistIn");
+      const neckCm = document.getElementById("neckCm");
+      const neckIn = document.getElementById("neckIn");
+      const hipCm = document.getElementById("hipCm");
+      const hipIn = document.getElementById("hipIn");
+
+      unitInput.value = "cm";
+
+      toggle.addEventListener("change", () => {
+        if (toggle.checked) {
+          unitInput.value = "imperial";
+          heightCmGroup.style.display = "none";
+          heightFtInGroup.style.display = "block";
+
+          waistCm.style.display = "none"; waistIn.style.display = "block";
+          neckCm.style.display = "none"; neckIn.style.display = "block";
+          hipCm.style.display = "none"; hipIn.style.display = "block";
+        } else {
+          unitInput.value = "cm";
+          heightCmGroup.style.display = "block";
+          heightFtInGroup.style.display = "none";
+
+          waistCm.style.display = "block"; waistIn.style.display = "none";
+          neckCm.style.display = "block"; neckIn.style.display = "none";
+          hipCm.style.display = "block"; hipIn.style.display = "none";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ calc.icon }} {{ calc.name }} | Fitness Fixe</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f9fafb; }
+    .card { border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .result-box { background: #fff3e0; border-radius: 12px; padding: 20px; }
+    .sugar-bar { height: 22px; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-7 col-md-9">
+        <div class="card p-4">
+          <h2 class="text-center mb-4">{{ calc.icon }} {{ calc.name }}</h2>
+
+          <!-- Input Form -->
+          <form method="POST">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Age</label>
+                <input type="number" class="form-control" name="age" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="gender" required>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Weight (kg)</label>
+                <input type="number" class="form-control" name="weight" required>
+              </div>
+            </div>
+
+            <h5 class="mt-4">🍫 Add Food & Drinks</h5>
+            <div id="food-container">
+              <div class="row g-2 mb-2 food-row">
+                <div class="col-md-7">
+                  <select class="form-select" name="item">
+                    {% for food, data in foods.items() %}
+                      <option value="{{ food }}">{{ food }} ({{ data.unit }})</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <input type="number" class="form-control" name="quantity" placeholder="Qty" min="0">
+                </div>
+                <div class="col-md-2">
+                  <button type="button" class="btn btn-outline-danger w-100 remove-row"> Remove Row </button>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary w-100 mb-3" id="add-row">+ Add Another</button>
+
+            <button type="submit" class="btn btn-danger w-100">Check Sugar Intake</button>
+          </form>
+
+          <!-- Results -->
+          {% if result %}
+          <div class="result-box mt-4">
+            {% if result.error %}
+              <div class="alert alert-danger">{{ result.error }}</div>
+            {% else %}
+              <h4 class="text-center mb-3">🍬 Your Sugar Report</h4>
+              <ul class="list-group mb-3">
+                <li class="list-group-item">Your Intake: <strong>{{ result.total_sugar }} g/day</strong></li>
+                <li class="list-group-item">Ideal Limit (5%): <strong>{{ result.max_safe }} g/day</strong></li>
+                <li class="list-group-item">Upper Limit (10%): <strong>{{ result.max_limit }} g/day</strong></li>
+                <li class="list-group-item">Calories from Sugar: <strong>{{ result.sugar_pct }}%</strong></li>
+                <li class="list-group-item">Status: <strong>{{ result.status }}</strong></li>
+              </ul>
+
+              <!-- Progress Bar -->
+              <div class="progress mb-2">
+                <div class="progress-bar bg-danger sugar-bar" role="progressbar"
+                     style="width: {{ (result.total_sugar / result.max_limit * 100) | round(0) }}%;"
+                     aria-valuenow="{{ result.total_sugar }}" aria-valuemin="0" aria-valuemax="{{ result.max_limit }}">
+                  {{ result.total_sugar }} g
+                </div>
+              </div>
+              <p class="text-center text-muted">Relative to safe upper limit (10% of daily calories)</p>
+
+              <!-- Breakdown -->
+              <h6>Breakdown:</h6>
+              <ul class="list-group mb-3">
+                {% for row in result.breakdown %}
+                  <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ row.item }} ({{ row.qty }} units)</span>
+                    <span><strong>{{ row.sugar }} g</strong></span>
+                  </li>
+                {% endfor %}
+              </ul>
+
+              <!-- Advice -->
+              <div class="alert alert-info text-center">{{ result.advice }}</div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dynamic row add/remove
+    document.addEventListener("DOMContentLoaded", function() {
+      const container = document.getElementById("food-container");
+      const addBtn = document.getElementById("add-row");
+
+      addBtn.addEventListener("click", function() {
+        const row = document.querySelector(".food-row").cloneNode(true);
+        row.querySelectorAll("input").forEach(i => i.value = "");
+        container.appendChild(row);
+      });
+
+      container.addEventListener("click", function(e) {
+        if (e.target.classList.contains("remove-row")) {
+          if (document.querySelectorAll(".food-row").length > 1) {
+            e.target.closest(".food-row").remove();
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

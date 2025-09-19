@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ calc.icon }} {{ calc.name }} | Fitness Fixe</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: #f9fafb; }
+    .card { border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.06); }
+    .result-box { background: #eef2ff; border-radius: 10px; padding: 18px; }
+    canvas { max-height: 220px; }
+  </style>
+</head>
+<body>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card p-4">
+        <h2 class="text-center mb-4">{{ calc.icon }} {{ calc.name }}</h2>
+
+        <!-- Form -->
+        <form method="POST">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Systolic (mmHg)</label>
+              <input type="number" class="form-control" name="systolic" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Diastolic (mmHg)</label>
+              <input type="number" class="form-control" name="diastolic" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Age (optional)</label>
+              <input type="number" class="form-control" name="age">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Family History of Hypertension</label>
+              <select class="form-select" name="history">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-3">Check Risk</button>
+        </form>
+
+        {% if result %}
+        <div class="result-box mt-4">
+          {% if result.error %}
+            <div class="alert alert-danger">{{ result.error }}</div>
+          {% else %}
+            <h4 class="text-center mb-3">💓 BP Report</h4>
+
+            <ul class="list-group mb-3">
+              <li class="list-group-item">Systolic: <strong>{{ result.systolic }} mmHg</strong> ({{ result.sys_cat }})</li>
+              <li class="list-group-item">Diastolic: <strong>{{ result.diastolic }} mmHg</strong> ({{ result.dia_cat }})</li>
+              <li class="list-group-item">Overall Category: <strong>{{ result.category }}</strong></li>
+            </ul>
+
+            <!-- Gauges -->
+            <div class="row">
+              <div class="col-md-6 text-center">
+                <h6>Systolic</h6>
+                <canvas id="systolicGauge"></canvas>
+              </div>
+              <div class="col-md-6 text-center">
+                <h6>Diastolic</h6>
+                <canvas id="diastolicGauge"></canvas>
+              </div>
+            </div>
+
+            <div class="alert alert-info text-center mt-3">{{ result.advice }}</div>
+
+            <!-- Reference Table -->
+            <h5 class="mt-4 text-center">📊 Blood Pressure Categories (AHA)</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped text-center">
+                <thead class="table-light">
+                  <tr>
+                    <th>Category</th>
+                    <th>Systolic (mmHg)</th>
+                    <th>Diastolic (mmHg)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Normal</td><td>&lt;120</td><td>&lt;80</td></tr>
+                  <tr><td>Elevated</td><td>120–129</td><td>&lt;80</td></tr>
+                  <tr><td>High BP Stage 1</td><td>130–139</td><td>80–89</td></tr>
+                  <tr><td>High BP Stage 2</td><td>≥140</td><td>≥90</td></tr>
+                  <tr><td>Hypertensive Crisis</td><td>≥180</td><td>≥120</td></tr>
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+{% if result %}
+function makeGauge(ctx, value, maxVal, color) {
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: { datasets: [{ data: [value, maxVal - value], backgroundColor: [color, '#e0e0e0'] }] },
+    options: {
+      rotation: -90,
+      circumference: 180,
+      cutout: '70%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    }
+  });
+}
+
+// Color mapping
+function colorFor(cat) {
+  if (cat === "Normal") return "#4caf50";
+  if (cat === "Elevated") return "#ffc107";
+  if (cat.includes("Stage 1")) return "#ff9800";
+  if (cat.includes("Stage 2")) return "#f44336";
+  if (cat.includes("Crisis")) return "#b71c1c";
+  if (cat === "Hypotension") return "#2196f3";
+  return "#9e9e9e";
+}
+
+makeGauge(
+  document.getElementById('systolicGauge'),
+  {{ result.systolic }},
+  200,
+  colorFor("{{ result.sys_cat }}")
+);
+
+makeGauge(
+  document.getElementById('diastolicGauge'),
+  {{ result.diastolic }},
+  140,
+  colorFor("{{ result.dia_cat }}")
+);
+{% endif %}
+</script>
+</body>
+</html>
