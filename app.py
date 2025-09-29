@@ -116,6 +116,11 @@ def index():
     print("DEBUG calculators:", len(CALCULATORS))
     return render_template('index.html', calculators=CALCULATORS, categories=categories)
 
+@app.route('/robots.txt')
+def robots_txt():
+    return app.send_static_file('robots.txt')
+
+
 
 # -------------------------
 # Existing routes unchanged
